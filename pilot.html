@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CareerVerse - Pilot Simulation</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <!-- Environment setup -->
+      <a-sky color="#87CEEB"></a-sky> <!-- Sky block -->
+      
+      <!-- Cockpit Console -->
+      <a-box position="0 0.5 -2" width="3" height="1" depth="1" color="#333"></a-box>
+      
+      <!-- Task Instructions -->
+      <a-text id="feedbackText" value="Look at the red button to initiate takeoff" align="center" position="0 2.5 -2" color="#111" width="5"></a-text>
+
+      <!-- Takeoff Task Object -->
+      <a-cylinder position="0 1.1 -1.8" radius="0.1" height="0.1" color="#FF0000" class="clickable"
+             interactable-task="taskName: Initiate Takeoff; targetColor: #00FF00">
+        <a-text value="Takeoff" align="center" position="0 0.2 0" scale="2 2 2" color="#FFF"></a-text>
+      </a-cylinder>
+
+      <!-- Return Button (Hidden by default) -->
+      <a-plane id="returnButton" position="0 1.5 -1.5" rotation="0 0 0" width="1.5" height="0.5" color="#4CC3D9" visible="false" return-to-hub>
+        <a-text value="Return to Hub" align="center" position="0 0 0.1" color="#FFF"></a-text>
+      </a-plane>
+
+      <!-- VR Camera & Cursor Setup -->
+      <a-entity position="0 1.6 0">
+        <a-camera>
+          <a-entity cursor="fuse: false; rayOrigin: mouse;"
+                    position="0 0 -1"
+                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                    material="color: white; shader: flat">
+          </a-entity>
+        </a-camera>
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>

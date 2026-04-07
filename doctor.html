@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CareerVerse - Doctor Simulation</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <!-- Environment setup -->
+      <a-sky color="#FFF"></a-sky> <!-- Hospital white -->
+      <a-plane position="0 0 -4" rotation="-90 0 0" width="10" height="10" color="#ADD8E6"></a-plane>
+      
+      <!-- Patient / Bed placeholder -->
+      <a-box position="0 0.5 -3" width="2" height="1" depth="4" color="#D3D3D3"></a-box>
+      <a-cylinder position="0 1.2 -4" radius="0.4" height="0.5" rotation="90 0 0" color="#FFDAB9"></a-cylinder>
+
+      <!-- Task Instructions -->
+      <a-text id="feedbackText" value="Look at the Stethoscope to examine patient" align="center" position="0 2.5 -3" color="#333" width="5"></a-text>
+
+      <!-- Stethoscope Task Object -->
+      <a-box position="1.5 1.5 -2.5" scale="0.3 0.3 0.3" color="#FF4500" class="clickable"
+             interactable-task="taskName: Check Vitals; targetColor: #32CD32">
+        <a-text value="Stethoscope" align="center" position="0 1.5 0" scale="2 2 2" color="#333"></a-text>
+      </a-box>
+
+      <!-- Return Button (Hidden by default) -->
+      <a-plane id="returnButton" position="0 1 -2" rotation="0 0 0" width="1.5" height="0.5" color="#4CC3D9" visible="false" return-to-hub>
+        <a-text value="Return to Hub" align="center" position="0 0 0.1" color="#FFF"></a-text>
+      </a-plane>
+
+      <!-- VR Camera & Cursor Setup -->
+      <a-entity position="0 1.6 0">
+        <a-camera>
+          <a-entity cursor="fuse: false; rayOrigin: mouse;"
+                    position="0 0 -1"
+                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                    material="color: black; shader: flat">
+          </a-entity>
+        </a-camera>
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>
