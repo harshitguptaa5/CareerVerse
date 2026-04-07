@@ -2,46 +2,65 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>CareerVerse - Pilot Simulation</title>
+    <title>CareerVerse - Storm Flight</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
-    <a-scene webxr="referenceSpaceType: local" scene-greeting="message: Aviation Simulation active. Step 1: Engage main battery on the left.">
+    <a-scene webxr="referenceSpaceType: local" 
+             story-manager="career: pilot; 
+             introDialogue: Flight CV-7, you are flying into a category 4 storm. Brace for impact!; 
+             timeLimit: 25; 
+             climaxPrompt: Engine 2 failure! Warning!; 
+             goodChoice: Brace for Landing; 
+             badChoice: Eject">
       
       <!-- HUD -->
       <a-entity position="0 1.6 0">
         <a-camera>
           <a-entity cursor="fuse: false; rayOrigin: mouse;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: white; shader: flat" raycaster="objects: .clickable"></a-entity>
-          <a-text id="scoreDisplay" value="Score: 0" position="-1.5 0.8 -2" color="#0F0" font="mozillavr" scale="0.6 0.6 0.6"></a-text>
-          <a-text id="feedbackText" value="Current Objective: Engage Battery" align="center" position="0 0.9 -2" color="#FFF" width="3" font="mozillavr"></a-text>
+          
+          <a-text id="timerDisplay" value="T-25s" position="1.2 0.8 -2" color="#FF0000" font="mozillavr" scale="0.8 0.8 0.8"></a-text>
+          <a-text id="feedbackText" value="Awaiting Orders..." align="center" position="0 0.9 -2" color="#FFF" width="3" font="mozillavr"></a-text>
+
+          <!-- CLIMAX UI -->
+          <a-entity id="climaxUI" visible="false" position="0 100 0">
+            <a-plane width="3" height="1.5" color="#000" opacity="0.9"></a-plane>
+            <a-text value="CRITICAL DECISION:" align="center" position="0 0.4 0.01" color="#FF0000"></a-text>
+            
+             <a-box position="-0.8 -0.2 0.05" width="1" height="0.4" depth="0.1" color="#e74c3c" class="clickable" climax-choice="isGoodChoice: false">
+               <a-text value="Eject!" align="center" position="0 0 0.06" scale="0.6 0.6 0.6"></a-text>
+            </a-box>
+
+            <a-box position="0.8 -0.2 0.05" width="1" height="0.4" depth="0.1" color="#2ecc71" class="clickable" climax-choice="isGoodChoice: true">
+               <a-text value="Emergency\nLanding" align="center" position="0 0 0.06" scale="0.6 0.6 0.6"></a-text>
+            </a-box>
+          </a-entity>
+
         </a-camera>
+        <!-- Camera Shake Effect -->
+        <a-animation attribute="position" from="0 1.6 0" to="0 1.62 0.02" dur="50" dir="alternate" loop="true"></a-animation>
       </a-entity>
-      <!-- Meta Quest VR Controllers -->
+
+      <!-- VR Controllers -->
       <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
       <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20"></a-entity>
 
-      <!-- Sky & Cockpit -->
-      <a-sky color="#2c3e50"></a-sky> 
+      <!-- Storm Environment -->
+      <a-sky color="#1a1a2e"></a-sky> 
+      <a-light type="ambient" color="#222"></a-light>
+      <a-light type="directional" color="#fff" intensity="0.1" position="-1 1 0" animation="property: intensity; to: 5; dur: 100; dir: alternate; loop: true; delay: 2000"></a-light> <!-- Lightning -->
+
       <a-box position="0 0.5 -1.5" width="4" height="1" depth="1" color="#111"></a-box> <!-- Console -->
-      <a-plane position="0 3 -5" width="20" height="10" color="#3498db"></a-plane> <!-- Window view -->
-
-      <!-- TASK 1: Battery -->
-      <a-cylinder position="-1 1.2 -1.2" radius="0.1" height="0.1" rotation="90 0 0" color="#e74c3c" class="clickable"
-             multi-step-task="career: pilot; stepOrder: 1; taskName: Battery; successMessage: Battery engaged. Systems online. Next, push the center Thruster; points: 10">
-        <a-text value="1" align="center" position="0 0.2 0" scale="2 2 2" color="#FFF" rotation="-90 0 0"></a-text>
-      </a-cylinder>
-
-      <!-- TASK 2: Thruster -->
-      <a-box position="0 1.2 -1.2" depth="0.2" width="0.2" height="0.4" rotation="20 0 0" color="#f1c40f" class="clickable"
-             multi-step-task="career: pilot; stepOrder: 2; taskName: Thruster; successMessage: Thrusters at 100%. Next, raise the landing gear on the right; points: 15">
-         <a-text value="2" align="center" position="0 0.3 0" scale="2 2 2" color="#FFF"></a-text>
+      
+      <!-- TASK 1: Override Lever -->
+      <a-box position="-1 1.2 -1.2" depth="0.2" width="0.1" height="0.5" rotation="45 0 0" color="#f1c40f" class="clickable" story-task="taskName: Override Engaged">
+        <a-text value="Override" align="center" position="0 0.3 0" scale="2 2 2" color="#FFF"></a-text>
       </a-box>
 
-      <!-- TASK 3: Landing Gear -->
-      <a-cylinder position="1 1.2 -1.2" radius="0.1" height="0.1" rotation="90 0 0" color="#9b59b6" class="clickable"
-             multi-step-task="career: pilot; stepOrder: 3; taskName: Gear; successMessage: Landing gear raised. Takeoff successful!; points: 20">
-         <a-text value="3" align="center" position="0 0.2 0" scale="2 2 2" color="#FFF" rotation="-90 0 0"></a-text>
+      <!-- TASK 2: Altitude Yoke -->
+      <a-cylinder position="1 1.2 -1.2" radius="0.1" height="0.2" rotation="90 0 0" color="#9b59b6" class="clickable" story-task="taskName: Yoke Pulled">
+         <a-text value="Pull Yoke" align="center" position="0 0.2 0" scale="2 2 2" color="#FFF" rotation="-90 0 0"></a-text>
       </a-cylinder>
 
       <a-plane id="returnButton" position="0 1.8 -1.4" rotation="0 0 0" width="1.5" height="0.4" color="#2ecc71" visible="false" return-to-hub>

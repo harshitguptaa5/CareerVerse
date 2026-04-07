@@ -1,4 +1,4 @@
-// CareerVerse Global State Manager & Gamification System
+// Global State
 const CareerState = {
   getProfile: function() {
     let profile = localStorage.getItem('careerVerseProfile');
@@ -30,109 +30,162 @@ const CareerState = {
   }
 };
 
-// AI Voice Assistant (Web Speech API)
-const AIVoice = {
-  speak: function(text) {
+// AI Voice/Character Dialogue System
+const Dialogue = {
+  speak: function(text, pitch = 1.0, rate = 1.0) {
     if ('speechSynthesis' in window) {
-      // Cancel any ongoing speech to avoid overlap
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.pitch = 1.1; // Slightly futuristic/friendly
-      utterance.rate = 0.9;
+      utterance.pitch = pitch;
+      utterance.rate = rate;
       window.speechSynthesis.speak(utterance);
-    } else {
-      console.log("SpeechSynthesis not supported");
     }
   }
 };
 
-// Multi-step Task Logic Component
-AFRAME.registerComponent('multi-step-task', {
+// Cinematic Story Manager
+AFRAME.registerComponent('story-manager', {
   schema: {
     career: { type: 'string', default: 'doctor' },
-    stepOrder: { type: 'number', default: 1 }, // Kept for schema compatibility but ignored
-    taskName: { type: 'string', default: 'Task' },
-    successMessage: { type: 'string', default: 'Done!' },
-    points: { type: 'number', default: 10 }
+    introDialogue: { type: 'string', default: 'Begin.' },
+    timeLimit: { type: 'number', default: 60 },
+    climaxPrompt: { type: 'string', default: 'Critical Decision!' },
+    goodChoice: { type: 'string', default: 'Action A' },
+    badChoice: { type: 'string', default: 'Action B' }
   },
 
   init: function () {
-    const el = this.el;
-    const data = this.data;
-    
-    // Original style preservation
-    this.originalColor = el.getAttribute('color') || '#FFFFFF';
-    this.isCompleted = false;
+    this.timer = this.data.timeLimit;
+    this.timerRunning = false;
+    this.climaxTriggered = false;
 
-    // Track total tasks completed instead of steps
+    // Start Intro after 2 seconds
+    setTimeout(() => {
+      Dialogue.speak(this.data.introDialogue, 1.2, 1.1); // Slightly faster for urgency
+      this.timerRunning = true;
+      
+      const feedbackText = document.querySelector('#feedbackText');
+      if(feedbackText) {
+          feedbackText.setAttribute('value', 'URGENT: Complete tasks before time runs out!');
+          feedbackText.setAttribute('color', '#FF0000');
+      }
+    }, 2000);
+
+    // Timer Loop
+    this.tickInterval = setInterval(() => {
+      if (this.timerRunning && !this.climaxTriggered) {
+        this.timer--;
+        
+        const timerUI = document.querySelector('#timerDisplay');
+        if (timerUI) timerUI.setAttribute('value', 'T-' + this.timer + 's');
+
+        if (this.timer <= 0) {
+          this.timerRunning = false;
+          this.triggerFailure("Time ran out. The situation was lost.");
+        }
+      }
+    }, 1000);
+  },
+
+  checkProgression: function() {
     const sceneEl = document.querySelector('a-scene');
-    if (!sceneEl.hasAttribute('data-tasks-done')) {
-      sceneEl.setAttribute('data-tasks-done', 0);
+    let tasksDone = parseInt(sceneEl.getAttribute('data-tasks-done'));
+    if (tasksDone >= 2 && !this.climaxTriggered) {
+      this.triggerClimax();
     }
+  },
 
-    el.addEventListener('mouseenter', () => {
-      if (!this.isCompleted) el.setAttribute('scale', '1.1 1.1 1.1');
-    });
-    el.addEventListener('mouseleave', () => {
-      if (!this.isCompleted) el.setAttribute('scale', '1 1 1');
-    });
+  triggerClimax: function() {
+    this.climaxTriggered = true;
+    this.timerRunning = false; // Pause timer for climax
 
-    el.addEventListener('click', () => {
+    // Dim the lights
+    const sky = document.querySelector('a-sky');
+    if (sky) sky.setAttribute('color', '#220000'); // Red tint
+
+    Dialogue.speak("Critical Warning! " + this.data.climaxPrompt, 0.8, 1.2);
+    
+    // Show climax UI
+    const climaxUI = document.querySelector('#climaxUI');
+    if (climaxUI) {
+      climaxUI.setAttribute('visible', 'true');
+      climaxUI.setAttribute('position', '0 1.5 -1.5'); // Bring to front
+    }
+  },
+
+  triggerFailure: function(reason) {
+    Dialogue.speak(reason, 0.5, 0.8);
+    CareerState.updateScore(this.data.career, -50);
+    setTimeout(() => { window.location.href = 'analytics.html'; }, 4000);
+  },
+
+  resolveClimax: function(success) {
+    const climaxUI = document.querySelector('#climaxUI');
+    if (climaxUI) climaxUI.setAttribute('visible', 'false');
+
+    if (success) {
+      Dialogue.speak("Crisis averted. Excellent work under pressure. Simulation ended.", 1.0, 1.0);
+      CareerState.updateScore(this.data.career, 100 + this.timer); // Bonus points for remaining time
+      
+      const sky = document.querySelector('a-sky');
+      if (sky) sky.setAttribute('color', '#004400'); // Green tint for success
+      
+      setTimeout(() => {
+        const returnButton = document.querySelector('#returnButton');
+        if (returnButton) {
+          returnButton.setAttribute('visible', 'true');
+          returnButton.classList.add('clickable');
+        }
+      }, 3000);
+    } else {
+      this.triggerFailure("Critical Failure. Wrong decision made.");
+    }
+  }
+});
+
+// Climax Choice Button
+AFRAME.registerComponent('climax-choice', {
+  schema: { isGoodChoice: { type: 'boolean', default: true } },
+  init: function () {
+    this.el.addEventListener('click', () => {
+      const storyManager = document.querySelector('a-scene').components['story-manager'];
+      if(storyManager) storyManager.resolveClimax(this.data.isGoodChoice);
+    });
+    this.el.addEventListener('mouseenter', () => this.el.setAttribute('scale', '1.1 1.1 1.1'));
+    this.el.addEventListener('mouseleave', () => this.el.setAttribute('scale', '1 1 1'));
+  }
+});
+
+// Interactive Story Object
+AFRAME.registerComponent('story-task', {
+  schema: { taskName: { type: 'string', default: 'Task' } },
+  init: function () {
+    this.isCompleted = false;
+    const sceneEl = document.querySelector('a-scene');
+    if (!sceneEl.hasAttribute('data-tasks-done')) sceneEl.setAttribute('data-tasks-done', 0);
+
+    this.el.addEventListener('mouseenter', () => { if (!this.isCompleted) this.el.setAttribute('scale', '1.1 1.1 1.1'); });
+    this.el.addEventListener('mouseleave', () => { if (!this.isCompleted) this.el.setAttribute('scale', '1 1 1'); });
+
+    this.el.addEventListener('click', () => {
       if (this.isCompleted) return;
-
-      // Unlocked freely! No red errors.
       this.isCompleted = true;
-      el.setAttribute('color', '#00FF00'); // Green for good
+      this.el.setAttribute('color', '#00FF00'); 
       
-      // Update gamification
-      CareerState.updateScore(data.career, data.points);
-      let profile = CareerState.getProfile();
-      
-      const scoreDisplay = document.querySelector('#scoreDisplay');
-      if(scoreDisplay) scoreDisplay.setAttribute('value', 'Score: ' + profile[data.career].score);
-      
-      // Update progression
       let tasksDone = parseInt(sceneEl.getAttribute('data-tasks-done')) + 1;
       sceneEl.setAttribute('data-tasks-done', tasksDone);
       
-      const feedbackText = document.querySelector('#feedbackText');
-      if(feedbackText) feedbackText.setAttribute('value', data.successMessage);
-      AIVoice.speak(data.successMessage);
-
-      // Check if all 3 are completed
-      if (tasksDone >= 3) {
-         setTimeout(() => {
-           AIVoice.speak("Simulation complete. Excellent work. You may return to the hub.");
-           if(feedbackText) feedbackText.setAttribute('value', 'SIMULATION COMPLETE! +30 XP');
-           const returnButton = document.querySelector('#returnButton');
-           if (returnButton) {
-             returnButton.setAttribute('visible', 'true');
-             returnButton.classList.add('clickable');
-           }
-         }, 2000);
-      }
+      Dialogue.speak(this.data.taskName + " complete.");
+      
+      const storyManager = sceneEl.components['story-manager'];
+      if (storyManager) storyManager.checkProgression();
     });
   }
 });
 
-// A component to handle returning to hub
+// Return to hub
 AFRAME.registerComponent('return-to-hub', {
   init: function () {
-    this.el.addEventListener('click', function () {
-      window.location.href = 'index.html';
-    });
-  }
-});
-
-// Auto-greeting when scene loads
-AFRAME.registerComponent('scene-greeting', {
-  schema: { message: { type: 'string', default: 'Welcome.' } },
-  init: function () {
-    // Slight delay to ensure audio context is ready (some browsers require user interaction though)
-    // In VR environments, mouse-enter or click usually enables audio context context.
-    // For automatic audio, we might need a distinct user click first, but we will try this.
-    setTimeout(() => {
-      AIVoice.speak(this.data.message);
-    }, 1000);
+    this.el.addEventListener('click', function () { window.location.href = 'index.html'; });
   }
 });
