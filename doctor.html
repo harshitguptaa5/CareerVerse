@@ -7,39 +7,50 @@
     <script src="script.js"></script>
   </head>
   <body>
-    <a-scene>
-      <!-- Environment setup -->
-      <a-sky color="#FFF"></a-sky> <!-- Hospital white -->
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="10" height="10" color="#ADD8E6"></a-plane>
+    <!-- VR HUD layer -->
+    <a-scene scene-greeting="message: Doctor Simulation initialized. Step 1: Scan the patient's temperature using the blue scanner.">
       
-      <!-- Patient / Bed placeholder -->
+      <!-- HUD Text (Attached to Camera) -->
+      <a-entity position="0 1.6 0">
+        <a-camera>
+          <a-entity cursor="fuse: false; rayOrigin: mouse;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: black; shader: flat"></a-entity>
+          <!-- Score Overlay -->
+          <a-text id="scoreDisplay" value="Score: 0" position="-1.5 0.8 -2" color="#0F0" font="mozillavr" scale="0.6 0.6 0.6"></a-text>
+          <!-- Status Text -->
+          <a-text id="feedbackText" value="Current Objective: Scan Temperature" align="center" position="0 0.9 -2" color="#333" width="3" font="mozillavr"></a-text>
+        </a-camera>
+      </a-entity>
+
+      <!-- Environment -->
+      <a-sky color="#F0F8FF"></a-sky> <!-- Hospital white/blue -->
+      <a-plane position="0 0 -4" rotation="-90 0 0" width="10" height="10" color="#B0C4DE"></a-plane>
+      
+      <!-- Patient -->
       <a-box position="0 0.5 -3" width="2" height="1" depth="4" color="#D3D3D3"></a-box>
       <a-cylinder position="0 1.2 -4" radius="0.4" height="0.5" rotation="90 0 0" color="#FFDAB9"></a-cylinder>
 
-      <!-- Task Instructions -->
-      <a-text id="feedbackText" value="Look at the Stethoscope to examine patient" align="center" position="0 2.5 -3" color="#333" width="5"></a-text>
-
-      <!-- Stethoscope Task Object -->
-      <a-box position="1.5 1.5 -2.5" scale="0.3 0.3 0.3" color="#FF4500" class="clickable"
-             interactable-task="taskName: Check Vitals; targetColor: #32CD32">
-        <a-text value="Stethoscope" align="center" position="0 1.5 0" scale="2 2 2" color="#333"></a-text>
+      <!-- TASK 1: Thermometer (Blue) -->
+      <a-box position="-1 1.5 -2.5" scale="0.2 0.5 0.2" color="#0000FF" class="clickable"
+             multi-step-task="career: doctor; stepOrder: 1; taskName: Scan Temperature; successMessage: Temperature is 99 degrees. Next, use the Stethoscope to check heartbeat; points: 10">
+        <a-text value="Step 1:\nScanner" align="center" position="0 1.5 0" scale="2 2 2" color="#333"></a-text>
       </a-box>
 
-      <!-- Return Button (Hidden by default) -->
-      <a-plane id="returnButton" position="0 1 -2" rotation="0 0 0" width="1.5" height="0.5" color="#4CC3D9" visible="false" return-to-hub>
+      <!-- TASK 2: Stethoscope (Red) -->
+      <a-cylinder position="0 1.5 -2.5" scale="0.3 0.1 0.3" color="#FF0000" class="clickable"
+             multi-step-task="career: doctor; stepOrder: 2; taskName: Check Heartbeat; successMessage: Heartbeat normal. Finally, administer green Medicine; points: 15">
+        <a-text value="Step 2:\nStethoscope" align="center" position="0 2 0" scale="2 2 2" color="#333" rotation="0 0 0"></a-text>
+      </a-cylinder>
+
+      <!-- TASK 3: Medicine (Green) -->
+      <a-sphere position="1 1.5 -2.5" scale="0.2 0.2 0.2" color="#006400" class="clickable"
+             multi-step-task="career: doctor; stepOrder: 3; taskName: Administer Meds; successMessage: Medicine administered. Patient stabilized!; points: 20">
+        <a-text value="Step 3:\nMedicine" align="center" position="0 2 0" scale="4 4 4" color="#333"></a-text>
+      </a-sphere>
+
+      <!-- Return Button -->
+      <a-plane id="returnButton" position="0 2 -3" rotation="0 0 0" width="1.5" height="0.5" color="#4CC3D9" visible="false" return-to-hub>
         <a-text value="Return to Hub" align="center" position="0 0 0.1" color="#FFF"></a-text>
       </a-plane>
-
-      <!-- VR Camera & Cursor Setup -->
-      <a-entity position="0 1.6 0">
-        <a-camera>
-          <a-entity cursor="fuse: false; rayOrigin: mouse;"
-                    position="0 0 -1"
-                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                    material="color: black; shader: flat">
-          </a-entity>
-        </a-camera>
-      </a-entity>
 
     </a-scene>
   </body>

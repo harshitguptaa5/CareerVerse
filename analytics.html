@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CareerVerse - Advanced Analytics</title>
+    <style>
+      body {
+        background: #0f172a;
+        color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 50px;
+        margin: 0;
+      }
+      .card {
+        background: #1e293b;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+      }
+      h1 { color: #38bdf8; }
+      .metrics { display: flex; justify-content: space-around; margin: 30px 0; }
+      .metric-box { background: #334155; padding: 20px; border-radius: 8px; width: 30%; }
+      .metric-box h3 { margin: 0 0 10px 0; font-size: 1rem; color: #94a3b8; }
+      .metric-box .val { font-size: 2rem; font-weight: bold; color: #10b981; }
+      .winner {
+        background: #8b5cf6;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      button {
+        background: #38bdf8;
+        color: #0f172a;
+        border: none;
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      button:hover { background: #0284c7; color: white; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Performance Analytics</h1>
+      <p>System Analysis Complete. Here is your final assessment.</p>
+      
+      <div id="winnerBanner" class="winner">Calculating Best Fit...</div>
+      
+      <div class="metrics">
+        <div class="metric-box">
+          <h3>Medical Score</h3>
+          <div id="scoreDoc" class="val">0</div>
+        </div>
+        <div class="metric-box">
+          <h3>Aviation Score</h3>
+          <div id="scorePilot" class="val">0</div>
+        </div>
+        <div class="metric-box">
+          <h3>Dev Score</h3>
+          <div id="scoreSoft" class="val">0</div>
+        </div>
+      </div>
+      
+      <button onclick="clearData()">Reset Profile & Play Again</button>
+      <br><br>
+      <button onclick="window.location.href='index.html'" style="background:#475569;color:white;">Return to Hub</button>
+    </div>
+
+    <script>
+      let profile = localStorage.getItem('careerVerseProfile');
+      if (profile) {
+        profile = JSON.parse(profile);
+        
+        let d = profile.doctor.score;
+        let p = profile.pilot.score;
+        let s = profile.software.score;
+        
+        document.getElementById('scoreDoc').innerText = d;
+        document.getElementById('scorePilot').innerText = p;
+        document.getElementById('scoreSoft').innerText = s;
+        
+        let maxScore = Math.max(d, p, s);
+        let reco = "No Data";
+        if(maxScore > 0) {
+            if(maxScore === d) reco = "👨‍⚕️ Medical Professional";
+            else if(maxScore === p) reco = "✈️ Aviation Commander";
+            else reco = "💻 Software Architect";
+        }
+        
+        document.getElementById('winnerBanner').innerText = "Recommended Career: " + reco;
+      }
+
+      function clearData() {
+        localStorage.removeItem('careerVerseProfile');
+        alert("Profile reset!");
+        window.location.href = 'index.html';
+      }
+    </script>
+  </body>
+</html>

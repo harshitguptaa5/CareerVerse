@@ -2,43 +2,117 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>CareerVerse - Main Hub</title>
+    <title>CareerVerse V2 - Main Hub</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="script.js"></script>
+    <style>
+      /* Modern UI Overlay */
+      #dashboard {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(15, 23, 42, 0.85); /* Glassmorphism */
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        font-family: 'Inter', sans-serif;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        z-index: 1000;
+        min-width: 200px;
+      }
+      h2 { margin-top: 0; font-size: 1.2rem; color: #38bdf8; }
+      .stat { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; }
+      .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; background: #334155; font-size: 0.8rem; margin: 2px; }
+      .badge.won { background: #10b981; }
+      #analyticsBtn {
+        margin-top: 15px; width: 100%; padding: 10px;
+        background: #8b5cf6; color: white; border: none; border-radius: 6px;
+        cursor: pointer; font-weight: bold; display: none;
+      }
+      #analyticsBtn:hover { background: #7c3aed; }
+    </style>
   </head>
   <body>
-    <a-scene>
-      <!-- Environment setup -->
-      <a-sky color="#ECECEC"></a-sky>
-      <!-- Floor -->
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="10" height="10" color="#7BC8A4"></a-plane>
+    <!-- 2D Overlay UI -->
+    <div id="dashboard">
+      <h2>Welcome Space Cadet</h2>
+      <div class="stat"><span>Global EXP:</span> <span id="globalExp">0</span></div>
+      <hr style="border-color: #334155;">
+      <div>
+        <span id="badge-doctor" class="badge">👨‍⚕️ Doctor Trainee</span>
+        <span id="badge-pilot" class="badge">✈️ Pilot Cadet</span>
+        <span id="badge-software" class="badge">💻 Junior Dev</span>
+      </div>
+      <button id="analyticsBtn" onclick="window.location.href='analytics.html'">View Advanced Analytics</button>
+    </div>
+
+    <!-- UI Logic Script -->
+    <script>
+      window.onload = () => {
+        // Must interact with page to enable SpeechSynthesis in some browsers
+        document.body.addEventListener('click', () => {
+             // Audio context unlock
+        }, {once:true});
+
+        let profile = CareerState.getProfile();
+        document.getElementById('globalExp').innerText = profile.totalScore;
+        
+        let allDone = true;
+        
+        if (profile.doctor.completed) {
+            let b = document.getElementById('badge-doctor');
+            b.classList.add('won'); b.innerText = "👨‍⚕️ Licensed Doc";
+        } else { allDone = false; }
+        
+        if (profile.pilot.completed) {
+            let b = document.getElementById('badge-pilot');
+            b.classList.add('won'); b.innerText = "✈️ Captain";
+        } else { allDone = false; }
+        
+        if (profile.software.completed) {
+            let b = document.getElementById('badge-software');
+            b.classList.add('won'); b.innerText = "💻 Senior Dev";
+        } else { allDone = false; }
+
+        if (allDone) {
+            document.getElementById('analyticsBtn').style.display = 'block';
+        }
+      };
+    </script>
+
+    <!-- WebVR Scene -->
+    <a-scene scene-greeting="message: Welcome back to the CareerVerse Hub. Select a simulation to begin.">
+      <a-sky color="#0f172a"></a-sky> <!-- Dark space background -->
+      
+      <!-- Grid Floor -->
+      <a-grid src="https://cdn.aframe.io/a-painter/images/floor.jpg" material="repeat: 20 20" position="0 0 -4" rotation="-90 0 0" width="100" height="100"></a-grid>
       
       <!-- Title text -->
-      <a-text value="Welcome to CareerVerse!\nSelect a Career" align="center" position="0 2.5 -3" color="#333" width="6"></a-text>
+      <a-text value="Select a Career Portal" align="center" position="0 2.5 -3" color="#38bdf8" width="6" font="mozillavr"></a-text>
 
-      <!-- Portals / Hub Buttons -->
-      
       <!-- Doctor Portal -->
       <a-box id="doctorPortal" position="-2 1 -3" rotation="0 45 0" color="#ef2d5e" class="clickable"
-             animation__mouseenter="property: scale; to: 1.1 1.1 1.1; startEvents: mouseenter; dur: 200"
-             animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
+             animation__mouseenter="property: rotation; to: 15 45 0; startEvents: mouseenter; dur: 200"
+             animation__mouseleave="property: rotation; to: 0 45 0; startEvents: mouseleave; dur: 200"
              onclick="window.location.href='doctor.html'">
-        <a-text value="Doctor" align="center" position="0 0.6 0.51" scale="0.5 0.5 0.5" color="#FFF"></a-text>
+        <a-text value="1. Medical" align="center" position="0 0.6 0.51" scale="0.8 0.8 0.8" color="#FFF" font="mozillavr"></a-text>
       </a-box>
 
       <!-- Pilot Portal -->
       <a-box id="pilotPortal" position="0 1 -3" color="#4CC3D9" class="clickable"
-             animation__mouseenter="property: scale; to: 1.1 1.1 1.1; startEvents: mouseenter; dur: 200"
-             animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
+             animation__mouseenter="property: rotation; to: 15 0 0; startEvents: mouseenter; dur: 200"
+             animation__mouseleave="property: rotation; to: 0 0 0; startEvents: mouseleave; dur: 200"
              onclick="window.location.href='pilot.html'">
-        <a-text value="Pilot" align="center" position="0 0.6 0.51" scale="0.5 0.5 0.5" color="#FFF"></a-text>
+        <a-text value="2. Aviation" align="center" position="0 0.6 0.51" scale="0.8 0.8 0.8" color="#FFF" font="mozillavr"></a-text>
       </a-box>
 
       <!-- Software Engineer Portal -->
       <a-box id="softwarePortal" position="2 1 -3" rotation="0 -45 0" color="#FFC65D" class="clickable"
-             animation__mouseenter="property: scale; to: 1.1 1.1 1.1; startEvents: mouseenter; dur: 200"
-             animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
+             animation__mouseenter="property: rotation; to: 15 -45 0; startEvents: mouseenter; dur: 200"
+             animation__mouseleave="property: rotation; to: 0 -45 0; startEvents: mouseleave; dur: 200"
              onclick="window.location.href='software.html'">
-        <a-text value="Software\nEngineer" align="center" position="0 0.6 0.51" scale="0.5 0.5 0.5" color="#FFF"></a-text>
+        <a-text value="3. Engineering" align="center" position="0 0.6 0.51" scale="0.8 0.8 0.8" color="#FFF" font="mozillavr"></a-text>
       </a-box>
 
       <!-- VR Camera & Cursor Setup -->
@@ -47,14 +121,10 @@
           <a-entity cursor="fuse: false; rayOrigin: mouse;"
                     position="0 0 -1"
                     geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                    material="color: black; shader: flat"
-                    animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 150; from: 0.1 0.1 0.1; to: 1 1 1"
-                    animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 1500; from: 1 1 1; to: 0.1 0.1 0.1"
-                    animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 500; to: 1 1 1">
+                    material="color: #38bdf8; shader: flat">
           </a-entity>
         </a-camera>
       </a-entity>
-
     </a-scene>
   </body>
 </html>
