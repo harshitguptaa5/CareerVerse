@@ -2,45 +2,48 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>CareerVerse - ER Crisis</title>
+    <title>CareerVerse - ER Crisis (Anaphylaxis)</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
-    <!-- Story Manager applied to Scene -->
+    <!-- Story Manager: Severe Anaphylaxis -->
     <a-scene webxr="referenceSpaceType: local" 
              story-manager="career: doctor; 
-             introDialogue: Doctor! The patient just arrived from a crash. We are losing him! Act fast!; 
+             introDialogue: Doctor! Patient is in severe Anaphylactic Shock! Follow protocol to stabilize!; 
              timeLimit: 30; 
-             climaxPrompt: Patient is flatlining! What is your order?; 
-             goodChoice: Perform CPR; 
-             badChoice: Call Time of Death">
+             climaxPrompt: The EpiPen failed. Throat closing! Emergency intervention required!; 
+             goodChoice: Perform Tracheostomy; 
+             badChoice: Wait for Anesthesia">
       
-      <!-- HUD Text (Attached to Camera) -->
+      <!-- HUD / Camera Rig -->
       <a-entity position="0 1.6 0">
         <a-camera>
           <a-entity cursor="fuse: false; rayOrigin: mouse;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: white; shader: flat" raycaster="objects: .clickable"></a-entity>
           
-          <!-- Cinematic Timer -->
-          <a-text id="timerDisplay" value="T-30s" position="1.2 0.8 -2" color="#FF0000" font="mozillavr" scale="0.8 0.8 0.8"></a-text>
-          
-          <a-text id="feedbackText" value="Awaiting Orders..." align="center" position="0 0.9 -2" color="#FFF" width="3" font="mozillavr"></a-text>
+          <a-text id="timerDisplay" value="T-30s" position="1.1 0.8 -2" color="#FF0000" font="mozillavr" scale="0.8 0.8 0.8"></a-text>
 
-          <!-- CLIMAX UI (Hidden until Climax is triggered) -->
-          <a-entity id="climaxUI" visible="false" position="0 100 0"> <!-- Hidden far away initially -->
-            <a-plane width="3" height="1.5" color="#000" opacity="0.9"></a-plane>
-            <a-text value="CRITICAL DECISION:" align="center" position="0 0.4 0.01" color="#FF0000"></a-text>
-            
-            <a-box position="-0.8 -0.2 0.05" width="1" height="0.4" depth="0.1" color="#e74c3c" class="clickable" climax-choice="isGoodChoice: false">
-               <a-text value="Call Time\nof Death" align="center" position="0 0 0.06" scale="0.6 0.6 0.6"></a-text>
-            </a-box>
-
-            <a-box position="0.8 -0.2 0.05" width="1" height="0.4" depth="0.1" color="#3498db" class="clickable" climax-choice="isGoodChoice: true">
-               <a-text value="Perform CPR" align="center" position="0 0 0.06" scale="0.6 0.6 0.6"></a-text>
-            </a-box>
+          <!-- DYNAMIC GUIDE HUD -->
+          <a-entity position="-1.2 0.4 -2">
+            <a-plane width="1.8" height="1.0" color="#000" opacity="0.85"></a-plane>
+            <a-text value="CLINICAL PROTOCOL:" position="0 0.4 0.05" align="center" color="#fbbf24" scale="0.6 0.6 0.6" font="mozillavr"></a-text>
+            <a-text id="guideText" value="" position="-0.8 0.1 0.05" align="left" color="#38bdf8" scale="0.45 0.45 0.45" font="mozillavr" width="3.5"></a-text>
           </a-entity>
 
+          <!-- CLIMAX UI -->
+          <a-entity id="climaxUI" visible="false" position="0 100 0"> 
+            <a-plane width="3.5" height="1.8" color="#000" opacity="0.95"></a-plane>
+            <a-text value="CRITICAL PATIENT FAILURE:\nThroat totally closed. Oxygen at 40%." align="center" position="0 0.5 0.01" color="#FF0000" scale="0.7 0.7 0.7"></a-text>
+            
+            <a-box position="-0.9 -0.2 0.05" width="1.4" height="0.4" depth="0.1" color="#e74c3c" class="clickable" climax-choice="isGoodChoice: false">
+               <a-text value="Wait for\nAnesthesia" align="center" position="0 0 0.06" scale="0.6 0.6 0.6"></a-text>
+            </a-box>
+
+            <a-box position="0.9 -0.2 0.05" width="1.4" height="0.4" depth="0.1" color="#3498db" class="clickable" climax-choice="isGoodChoice: true">
+               <a-text value="Emergency\nTracheostomy" align="center" position="0 0 0.06" scale="0.6 0.6 0.6"></a-text>
+            </a-box>
+          </a-entity>
         </a-camera>
       </a-entity>
 
@@ -48,29 +51,30 @@
       <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
       <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20"></a-entity>
 
-      <!-- Beautiful Environment -->
-      <a-entity environment="preset: osiris"></a-entity>
+      <!-- Hospital Architecture -->
+      <a-entity environment="preset: osiris; skyType: color; lighting: point"></a-entity>
+      <a-light type="point" color="#ff0000" position="0 3 -2" intensity="1" animation="property: intensity; to: 0.3; dir: alternate; loop: true; dur: 600"></a-light>
       
-      <!-- Emergency Flashing Light emitting red glow -->
-      <a-light type="point" color="#ff0000" position="0 3 -2" intensity="1" animation="property: intensity; to: 0.2; dir: alternate; loop: true; dur: 500"></a-light>
-      
-      <!-- Patient -->
+      <!-- Patient Bed -->
       <a-box position="0 0.5 -3" width="2" height="1" depth="4" color="#D3D3D3"></a-box>
-      <a-cylinder position="0 1.2 -4" radius="0.4" height="0.5" rotation="90 0 0" color="#FFDAB9"></a-cylinder>
 
-      <!-- TASK 1: Scanner -->
-      <a-box position="-1 1.5 -2.5" scale="0.2 0.5 0.2" color="#0000FF" class="clickable" story-task="taskName: Scanner">
-        <a-text value="Scanner" align="center" position="0 1.5 0" scale="2 2 2" color="#FFF"></a-text>
+      <!-- Task 1: Pulse Oximeter -->
+      <a-box position="-1 1.4 -2.6" scale="0.2 0.1 0.2" color="#0ea5e9" class="clickable" story-task="taskName: Oximeter; guideStep: Checked Blood Oxygen (78%)">
+        <a-text value="Pulse\nOximeter" align="center" position="0 1.5 0" scale="3 3 3" color="#FFF"></a-text>
       </a-box>
 
-      <!-- TASK 2: Defibrillator -->
-      <a-box position="1 1.5 -2.5" scale="0.4 0.2 0.4" color="#FFFF00" class="clickable" story-task="taskName: Defibrillator Charging">
-        <a-text value="Defib" align="center" position="0 2 0" scale="2 2 2" color="#FFF"></a-text>
-      </a-box>
+      <!-- Task 2: Stethoscope -->
+      <a-cylinder position="0 1.4 -2.6" radius="0.1" height="0.05" color="#94a3b8" class="clickable" story-task="taskName: Lungs; guideStep: Assessed Airways (Wheezing)">
+        <a-text value="Stethoscope" align="center" position="0 2 0" scale="3 3 3" color="#FFF"></a-text>
+      </a-cylinder>
+      
+      <!-- Task 3: EpiPen -->
+      <a-cylinder position="1 1.4 -2.6" radius="0.05" height="0.4" rotation="90 0 0" color="#fbbf24" class="clickable" story-task="taskName: Epinephrine; guideStep: Administered EpiPen">
+        <a-text value="Epi-Pen" align="center" position="0 3 0" scale="3 3 3" color="#FFF" rotation="-90 0 0"></a-text>
+      </a-cylinder>
 
-      <!-- Return Button -->
-      <a-plane id="returnButton" position="0 2 -3" rotation="0 0 0" width="1.5" height="0.5" color="#2ecc71" visible="false" return-to-hub>
-        <a-text value="Return to Hub" align="center" position="0 0 0.1" color="#FFF"></a-text>
+      <a-plane id="returnButton" position="0 2.2 -3" width="1.5" height="0.5" color="#2ecc71" visible="false" return-to-hub>
+        <a-text value="Return to Hub" align="center" position="0 0 0.1"></a-text>
       </a-plane>
 
     </a-scene>

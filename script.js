@@ -90,7 +90,7 @@ AFRAME.registerComponent('story-manager', {
   checkProgression: function() {
     const sceneEl = document.querySelector('a-scene');
     let tasksDone = parseInt(sceneEl.getAttribute('data-tasks-done'));
-    if (tasksDone >= 2 && !this.climaxTriggered) {
+    if (tasksDone >= 3 && !this.climaxTriggered) {
       this.triggerClimax();
     }
   },
@@ -158,7 +158,10 @@ AFRAME.registerComponent('climax-choice', {
 
 // Interactive Story Object
 AFRAME.registerComponent('story-task', {
-  schema: { taskName: { type: 'string', default: 'Task' } },
+  schema: { 
+    taskName: { type: 'string', default: 'Task' },
+    guideStep: { type: 'string', default: 'Completed step' }
+  },
   init: function () {
     this.isCompleted = false;
     const sceneEl = document.querySelector('a-scene');
@@ -175,13 +178,14 @@ AFRAME.registerComponent('story-task', {
       let tasksDone = parseInt(sceneEl.getAttribute('data-tasks-done')) + 1;
       sceneEl.setAttribute('data-tasks-done', tasksDone);
       
-      Dialogue.speak(this.data.taskName + " complete.");
+      Dialogue.speak(this.data.taskName + " logged.");
       
-      // FIX: Update HUD dynamically
-      const feedbackText = document.querySelector('#feedbackText');
-      if (feedbackText) {
-          feedbackText.setAttribute('value', this.data.taskName + ' Completed!');
-          feedbackText.setAttribute('color', '#00FF00'); // Green success text
+      // Update dynamic HUD
+      const guideText = document.querySelector('#guideText');
+      if (guideText) {
+          let currentText = guideText.getAttribute('value');
+          // Add a checkmark and the completed step to the UI Guide
+          guideText.setAttribute('value', currentText + '\n[X] ' + this.data.guideStep);
       }
       
       const storyManager = sceneEl.components['story-manager'];
