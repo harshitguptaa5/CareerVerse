@@ -12,11 +12,14 @@
       <!-- HUD -->
       <a-entity position="0 1.6 0">
         <a-camera>
-          <a-entity cursor="fuse: false; rayOrigin: mouse;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: white; shader: flat"></a-entity>
+          <a-entity cursor="fuse: false; rayOrigin: mouse;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: white; shader: flat" raycaster="objects: .clickable"></a-entity>
           <a-text id="scoreDisplay" value="Score: 0" position="-1.5 0.8 -2" color="#0F0" font="mozillavr" scale="0.6 0.6 0.6"></a-text>
           <a-text id="feedbackText" value="Current Objective: Engage Battery" align="center" position="0 0.9 -2" color="#FFF" width="3" font="mozillavr"></a-text>
         </a-camera>
       </a-entity>
+      <!-- Meta Quest VR Controllers -->
+      <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
+      <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20"></a-entity>
 
       <!-- Sky & Cockpit -->
       <a-sky color="#2c3e50"></a-sky> 

@@ -50,7 +50,7 @@ const AIVoice = {
 AFRAME.registerComponent('multi-step-task', {
   schema: {
     career: { type: 'string', default: 'doctor' },
-    stepOrder: { type: 'number', default: 1 },
+    stepOrder: { type: 'number', default: 1 }, // Kept for schema compatibility but ignored
     taskName: { type: 'string', default: 'Task' },
     successMessage: { type: 'string', default: 'Done!' },
     points: { type: 'number', default: 10 }
@@ -64,10 +64,10 @@ AFRAME.registerComponent('multi-step-task', {
     this.originalColor = el.getAttribute('color') || '#FFFFFF';
     this.isCompleted = false;
 
-    // We store the current step on the scene element to track global progress
+    // Track total tasks completed instead of steps
     const sceneEl = document.querySelector('a-scene');
-    if (!sceneEl.hasAttribute('data-current-step')) {
-      sceneEl.setAttribute('data-current-step', 1);
+    if (!sceneEl.hasAttribute('data-tasks-done')) {
+      sceneEl.setAttribute('data-tasks-done', 0);
     }
 
     el.addEventListener('mouseenter', () => {
@@ -80,51 +80,36 @@ AFRAME.registerComponent('multi-step-task', {
     el.addEventListener('click', () => {
       if (this.isCompleted) return;
 
-      let currentStep = parseInt(sceneEl.getAttribute('data-current-step'));
-
-      const feedbackText = document.querySelector('#feedbackText');
+      // Unlocked freely! No red errors.
+      this.isCompleted = true;
+      el.setAttribute('color', '#00FF00'); // Green for good
+      
+      // Update gamification
+      CareerState.updateScore(data.career, data.points);
+      let profile = CareerState.getProfile();
+      
       const scoreDisplay = document.querySelector('#scoreDisplay');
+      if(scoreDisplay) scoreDisplay.setAttribute('value', 'Score: ' + profile[data.career].score);
+      
+      // Update progression
+      let tasksDone = parseInt(sceneEl.getAttribute('data-tasks-done')) + 1;
+      sceneEl.setAttribute('data-tasks-done', tasksDone);
+      
+      const feedbackText = document.querySelector('#feedbackText');
+      if(feedbackText) feedbackText.setAttribute('value', data.successMessage);
+      AIVoice.speak(data.successMessage);
 
-      if (currentStep === data.stepOrder) {
-        // Correct step!
-        this.isCompleted = true;
-        el.setAttribute('color', '#00FF00'); // Green for good
-        
-        // Update gamification
-        CareerState.updateScore(data.career, data.points);
-        let profile = CareerState.getProfile();
-        if(scoreDisplay) scoreDisplay.setAttribute('value', 'Score: ' + profile[data.career].score);
-        
-        // Update progression
-        sceneEl.setAttribute('data-current-step', currentStep + 1);
-        
-        // Voice and Text Feedback
-        if(feedbackText) feedbackText.setAttribute('value', data.successMessage);
-        AIVoice.speak(data.successMessage);
-
-        // Check if level is complete (Assuming 3 steps per level for now)
-        if (currentStep >= 3) {
-           setTimeout(() => {
-             AIVoice.speak("Simulation complete. Excellent work. You may return to the hub.");
-             if(feedbackText) feedbackText.setAttribute('value', 'SIMULATION COMPLETE! +30 XP');
-             const returnButton = document.querySelector('#returnButton');
-             if (returnButton) {
-               returnButton.setAttribute('visible', 'true');
-               returnButton.classList.add('clickable');
-             }
-           }, 2000);
-        }
-      } else if (currentStep < data.stepOrder) {
-        // Wrong order
-        el.setAttribute('color', '#FF0000'); // Red error flash
-        setTimeout(() => el.setAttribute('color', this.originalColor), 500);
-        
-        const errorMsg = "Error: Sequence incorrect. You must complete the previous tasks first.";
-        if(feedbackText) feedbackText.setAttribute('value', errorMsg);
-        AIVoice.speak(errorMsg);
-        
-        // Penalize score for mistake
-        CareerState.updateScore(data.career, -2); 
+      // Check if all 3 are completed
+      if (tasksDone >= 3) {
+         setTimeout(() => {
+           AIVoice.speak("Simulation complete. Excellent work. You may return to the hub.");
+           if(feedbackText) feedbackText.setAttribute('value', 'SIMULATION COMPLETE! +30 XP');
+           const returnButton = document.querySelector('#returnButton');
+           if (returnButton) {
+             returnButton.setAttribute('visible', 'true');
+             returnButton.classList.add('clickable');
+           }
+         }, 2000);
       }
     });
   }
