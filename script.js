@@ -177,6 +177,13 @@ AFRAME.registerComponent('story-task', {
       
       Dialogue.speak(this.data.taskName + " complete.");
       
+      // FIX: Update HUD dynamically
+      const feedbackText = document.querySelector('#feedbackText');
+      if (feedbackText) {
+          feedbackText.setAttribute('value', this.data.taskName + ' Completed!');
+          feedbackText.setAttribute('color', '#00FF00'); // Green success text
+      }
+      
       const storyManager = sceneEl.components['story-manager'];
       if (storyManager) storyManager.checkProgression();
     });

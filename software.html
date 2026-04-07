@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>CareerVerse - Server Crash</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
@@ -44,8 +45,9 @@
       <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
       <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20"></a-entity>
 
-      <!-- Dark Office Env -->
-      <a-sky color="#050510"></a-sky> 
+      <!-- Beautiful Tron Grid Environment -->
+      <a-entity environment="preset: tron"></a-entity>
+      
       <a-box position="0 0.8 -2" width="4" height="0.1" depth="2" color="#222"></a-box> <!-- Desk -->
       
       <!-- Glowing Red Monitors -->

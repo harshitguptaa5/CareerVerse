@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>CareerVerse - ER Crisis</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
@@ -47,9 +48,8 @@
       <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
       <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20"></a-entity>
 
-      <!-- Dramatic Environment -->
-      <a-sky color="#111111"></a-sky> <!-- Dark ER -->
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="10" height="10" color="#333344"></a-plane>
+      <!-- Beautiful Environment -->
+      <a-entity environment="preset: osiris"></a-entity>
       
       <!-- Emergency Flashing Light emitting red glow -->
       <a-light type="point" color="#ff0000" position="0 3 -2" intensity="1" animation="property: intensity; to: 0.2; dir: alternate; loop: true; dur: 500"></a-light>

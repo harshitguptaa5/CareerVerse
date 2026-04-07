@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>CareerVerse - Storm Flight</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
@@ -46,9 +47,9 @@
       <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
       <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20"></a-entity>
 
-      <!-- Storm Environment -->
-      <a-sky color="#1a1a2e"></a-sky> 
-      <a-light type="ambient" color="#222"></a-light>
+      <!-- Beautiful Volcanic Storm Environment -->
+      <a-entity environment="preset: volcan; skyType: atmosphere; lighting: point"></a-entity>
+      
       <a-light type="directional" color="#fff" intensity="0.1" position="-1 1 0" animation="property: intensity; to: 5; dur: 100; dir: alternate; loop: true; delay: 2000"></a-light> <!-- Lightning -->
 
       <a-box position="0 0.5 -1.5" width="4" height="1" depth="1" color="#111"></a-box> <!-- Console -->
